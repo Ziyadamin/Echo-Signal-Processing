@@ -1,0 +1,113 @@
+clear all;
+
+close all;
+
+clc;
+
+fs=50100;
+
+voice= audioread('Abbas Al Aqad Axis 30.m4a'); %Input: Original Signal
+
+sound(voice,fs) %Playing it out loud
+
+pause(length(voice)/fs);
+
+ 
+
+%System Equation Parameters
+
+delay = 0.5; 
+
+alpha = 0.65;
+
+ 
+
+%Plotting the original signal
+
+t=(0:length(voice)-1)/fs;
+
+subplot(3,1,1)
+
+plot(t,voice)
+
+grid on;
+
+xlabel('t'); ylabel('v(t)');
+
+title('Original Signal')
+
+ 
+
+%D is the length of the array we need to store the signal with the echo
+
+D=delay*fs;
+
+y= zeros(size(voice));
+
+y(1:D)=voice(1:D);
+
+ 
+
+%Adding the Echo to the Original Signal 
+
+for i=D+1:length(voice)
+
+   y(i) = voice(i) + alpha*voice(i-D); 
+
+end
+
+ 
+
+%{
+
+y = [zeros(y, 1); originalSignal(1:end-y)];
+
+ 
+
+% Create the echoed signal by adding the delayed signal with attenuation
+
+echoedSignal = originalSignal + attenuation * delayedSignal;
+
+%}
+
+ 
+
+%Plotting the Signal With Generated Echo
+
+subplot(3,1,2)
+
+plot(t,y)
+
+grid on;
+
+xlabel('t'); ylabel('y(t)');
+
+title('Signal With Echo');
+
+sound(y,fs)
+
+pause(length(voice)/fs)
+
+ 
+
+%Removing the Echo 
+
+b = [1,zeros(1,D),alpha];  
+
+m = filter(b,1,voice); 
+
+w=filter(1,b,y);
+
+%Plotting the Signal with Removed Echo
+
+subplot(3,1,3)
+
+plot(t,w)
+
+grid on;
+
+xlabel('t'); ylabel('w(t)');
+
+title('Signal With Removed Echo');
+
+sound(w,fs)
